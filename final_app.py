@@ -126,12 +126,13 @@ def main():
 
         
         st.write('The Bar chart of count per sentiment')
-
+        st.set_option('deprecation.showPyplotGlobalUse', False)
         #bar plot of the count of each sentiment
         plt.figure(figsize=(12,6))
         sns.countplot(x='sentiment',data=df, palette='Blues_d')
         plt.title('Count of Sentiments')
         st.pyplot()
+        st.set_option('deprecation.showPyplotGlobalUse', False)
         
         # average length of words overall
         df['stemm'].str.split().\
