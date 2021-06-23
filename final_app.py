@@ -43,34 +43,34 @@ news_vectorizer = open("resources/models/tfidfvect.pkl","rb")
 tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
 
 # Load your raw data
-raw = pd.read_csv("resources/train.csv")
+raw = pd.read_csv("resources/clean.csv")
 
 
 df = raw.copy()
 
 #removing noise using lemma and stemma
-lemmatizer = WordNetLemmatizer()
-stemmer = PorterStemmer()
+#lemmatizer = WordNetLemmatizer()
+#stemmer = PorterStemmer()
 # stemma
 
 #@st.cache(suppress_st_warning=True)
-def preprocess_stemm(sentence):
-    sentence=str(sentence)
-    sentence = sentence.lower()
-    sentence=sentence.replace('{html}',"") 
-    cleanr = re.compile('<.*?>')
-    cleantext = re.sub(cleanr, '', sentence)
-    rem_url=re.sub(r'http\S+', '',cleantext)
-    rem_num = re.sub('[0-9]+', '', rem_url)
-    tokenizer = RegexpTokenizer(r'\w+')
-    tokens = tokenizer.tokenize(rem_num)  
-    filtered_words = [w for w in tokens if len(w) > 2 if not w in stopwords.words('english')]
-    stem_words=[stemmer.stem(w) for w in filtered_words]
-    lemma_words=[lemmatizer.lemmatize(w) for w in stem_words]
-    return " ".join(lemma_words)
+# def preprocess_stemm(sentence):
+#     sentence=str(sentence)
+#     sentence = sentence.lower()
+#     sentence=sentence.replace('{html}',"") 
+#     cleanr = re.compile('<.*?>')
+#     cleantext = re.sub(cleanr, '', sentence)
+#     rem_url=re.sub(r'http\S+', '',cleantext)
+#     rem_num = re.sub('[0-9]+', '', rem_url)
+#     tokenizer = RegexpTokenizer(r'\w+')
+#     tokens = tokenizer.tokenize(rem_num)  
+#     filtered_words = [w for w in tokens if len(w) > 2 if not w in stopwords.words('english')]
+#     stem_words=[stemmer.stem(w) for w in filtered_words]
+#     lemma_words=[lemmatizer.lemmatize(w) for w in stem_words]
+#     return " ".join(lemma_words)
 
 # stemmatize the cleaned text data and creates a new column named 'Stemm'
-df['stemm']=df['message'].map(lambda s:preprocess_stemm(s))
+#df['stemm']=df['message'].map(lambda s:preprocess_stemm(s))
 
 #@st.cache(suppress_st_warning=True)
 def main():
@@ -89,7 +89,7 @@ def main():
     ##creating a sidebar for selection purposes
 
 
-    options = ['Information', 'EDA', 'Predict tweet', 'Lets Connect!']
+    options = ['Information', 'EDA', 'predict tweet', 'Lets Connect!']
 
     selection = st.sidebar.radio('Go to', options)
 
@@ -160,12 +160,12 @@ def main():
         plt.ylabel('Word Count per Tweet')
         st.pyplot()
 
-        #Funnel chart of proportion of each sentiment
-        fig = px.funnel_area(
-            text = dist.class_label,
-            values = dist.stemm,
-            title = {"position": "top center", "text": "Funnel-Chart of Sentiment Distribution"})
-        st.pyplot(fig)
+        # #Funnel chart of proportion of each sentiment
+        # fig = px.funnel_area(
+        #     names = dist.class_label,
+        #     values = dist.stemm,
+        #     title = {"position": "top center", "text": "Funnel-Chart of Sentiment Distribution"})
+        # st.pyplot(fig)
 
         
 
@@ -241,8 +241,8 @@ def main():
             if st.button('Classify'):
 
                 
-                clean_text1 = preprocess_stemm(tweet_text1) 
-                vect_text = tweet_cv.transform([clean_text1]).toarray()
+                #clean_text1 = preprocess_stemm(tweet_text1) 
+                vect_text = tweet_cv.transform([tweet_text1]).toarray()
 
                 if model1 == 'LinearSVC':
                     predictor = load_pickle("resources/models/LinearSVC.pkl")
@@ -303,8 +303,8 @@ def main():
             if st.button('Classify'):
 
                 # Transforming user input with vectorizer
-                clean_text2 = df[tweet_text2].apply(preprocess_stemm) #passing the text through the stemma function
-                vect_text = tweet_cv.transform([clean_text2]).toarray()
+                #clean_text2 = df[tweet_text2].apply(preprocess_stemm) #passing the text through the stemma function
+                vect_text = tweet_cv.transform([tweet_text2]).toarray()
                 if model2 == 'LinearSVC':
                     predictor = load_pickle("resources/models/LinearSVC.pkl")
                     prediction = predictor.predict(vect_text)
